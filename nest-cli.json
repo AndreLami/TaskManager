@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/tasks/src",
+  "monorepo": true,
+  "root": "apps/tasks",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/tasks/tsconfig.app.json"
+  },
+  "projects": {
+    "tasks": {
+      "type": "application",
+      "root": "apps/tasks",
+      "entryFile": "main",
+      "sourceRoot": "apps/tasks/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/tasks/tsconfig.app.json"
+      }
+    },
+    "notification": {
+      "type": "application",
+      "root": "apps/notification",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification/tsconfig.app.json"
+      }
+    },
+    "modules": {
+      "type": "application",
+      "root": "apps/modules",
+      "sourceRoot": "apps/modules/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/modules/tsconfig.app.json"
+      }
+    },
+    "shared": {
+      "type": "application",
+      "root": "apps/shared",
+      "entryFile": "main",
+      "sourceRoot": "apps/shared/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/shared/tsconfig.app.json"
+      }
+    }
+  }
+}
