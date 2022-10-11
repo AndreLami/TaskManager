@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TaskDependencyEntity } from '../../../shared/src/entities/task.dependency.entity';
 import { TaskStatus, TaskVisibility } from '../../../shared/src/entities/task.status';
 import { TasksHelper } from './tasks.helper';
-import { INestApplication } from '@nestjs/common/interfaces/nest-application.interface';
+import { CreateTaskDto } from './dto/create.task.dto';
 
 @Injectable()
 export class TasksService {
@@ -38,8 +38,11 @@ export class TasksService {
         }
 
         if (task.status != TaskStatus.InProgress) {
+            console.log(1)
             throw new CouldNotCompleteTaskTaskIsNotInProgressState()
         }
+
+        console.log(2)
 
         task.status = TaskStatus.Completed
         task = await this.taskRepository.save(task)
@@ -47,31 +50,32 @@ export class TasksService {
         return task
     }
 
-    async create(title: string, description: string, dependencies: number[]): Promise<TaskEntity> {
-        if (dependencies.length > this.maxDependenciesNumber) {
+    async create(taskData: CreateTaskDto): Promise<TaskEntity> {
+        if (taskData.dependencies.length > this.maxDependenciesNumber) {
             throw new TooManyTaskDependencies(this.maxDependenciesNumber);
         }
 
         const dependenciesCount = await this.taskRepository.count({
             where: {
-                id: In(dependencies), visibility: TaskVisibility.Visible
+                id: In(taskData.dependencies), visibility: TaskVisibility.Visible
             }
         })
 
-        if (dependenciesCount < dependencies.length) {
+        if (dependenciesCount < taskData.dependencies.length) {
             throw new IncorrectTaskDependencies()
         }
 
+        const initialStatus = dependenciesCount > 0 ? TaskStatus.Pending : TaskStatus.InProgress
         let task = this.taskRepository.create({
-            title: title, description: description,
+            name: taskData.name, description: taskData.description,
             visibility: TaskVisibility.Invisible,
-            status: TaskStatus.Pending
+            status: initialStatus
         })
 
         task = await this.taskRepository.save(task);
         if (dependenciesCount > 0) {
             task.parents = []
-            for (let dependencyId of dependencies) {
+            for (let dependencyId of taskData.dependencies) {
                 const dependency = this.taskDependencyRepository.create({
                     child: task,
                     parent: <TaskEntity>{id: dependencyId}
@@ -79,10 +83,13 @@ export class TasksService {
                 task.parents.push(dependency)
             }
 
-            await this.taskRepository.save(task)
+            await this.taskDependencyRepository.save(task.parents)
         }
 
-        await this.adjustTasksInProgressStatus([task])
+        if (dependenciesCount > 0) {
+            await this.adjustTasksInProgressStatus([task])
+        }
+
         task = await this.taskRepository.save({
             id: task.id, visibility: TaskVisibility.Visible
         })
@@ -110,12 +117,12 @@ export class TasksService {
             .map( task => task.id)
 
         const readyForInProgressTaskIds = await TasksHelper.collectReadyForInProgressTasks(taskIds, this.taskRepository)
-        const statusChangedTasks: [TaskEntity] = readyForInProgressTaskIds.map( taskId => {
-            return {id: taskId, status: TaskStatus.InProgress}
+
+        const statusChangedTasks: TaskEntity[] = readyForInProgressTaskIds.map( taskId => {
+            return <TaskEntity>{id: taskId, status: TaskStatus.InProgress}
         })
 
-
-        const resultTasks = await this.taskDependencyRepository.save(statusChangedTasks)
+        const resultTasks = await this.taskRepository.save(statusChangedTasks)
         this.notifyTasksAreReadyForProcessingIfNeeded(resultTasks)
 
         return resultTasks

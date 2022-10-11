@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { TaskDependencyEntity } from './task.dependency.entity';
 import { TaskStatus, TaskVisibility } from './task.status';
-
+import { Exclude } from "class-transformer";
 
 @Entity({ name: 'tasks', schema: 'public' })
 export class TaskEntity extends BaseEntity {
@@ -12,14 +12,12 @@ export class TaskEntity extends BaseEntity {
     @Column({ nullable: false, default: TaskStatus.Pending })
     status: number;
 
+    @Exclude({toClassOnly: true, toPlainOnly: false})
     @Column({ nullable: false, default: TaskVisibility.Invisible })
     visibility: number;
 
-    @Column({ nullable: false, default: false })
-    availability: boolean;
-
     @Column({ nullable: false, default: "" })
-    title: string;
+    name: string;
 
     @Column({ nullable: false, default: "" })
     description: string;
