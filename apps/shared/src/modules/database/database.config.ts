@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { AppEnvironment } from '../../environemtns/app.environment';
 
 export class DatabaseConfiguration {
     constructor(private readonly configService: ConfigService) {}
@@ -15,8 +16,8 @@ export class DatabaseConfiguration {
             entities: ['./shared/src/entities/*.entity.{ts,js}'],
             multipleStatements: true,
             autoLoadEntities: true,
-            synchronize: this.configService.get<string>('APP_ENV') === 'dev',
-            migrationsRun: this.configService.get<string>('APP_ENV') !== 'dev',
+            synchronize: this.configService.get<string>('APP_ENV') === AppEnvironment.Dev,
+            migrationsRun: this.configService.get<string>('APP_ENV') !== AppEnvironment.Dev,
             migrations: ['./dist/migrations/*.{ts,js}'],
             migrationsTableName: "ci_migrations"
         };

@@ -2,7 +2,7 @@ import { ExceptionFilter } from '@nestjs/common/interfaces/exceptions/exception-
 import { ArgumentsHost, Catch} from '@nestjs/common';
 import { Response } from 'express';
 import { HttpErrorRepresentable, IsHttpErrorRepresentable, IsTaskError } from './http.error.representable';
-import { ApiErrorRenderer } from './api.error.renderer';
+import { ApiErrorRenderer } from './api-error-renderer';
 import { InternalError, TaskError } from './task.errors';
 
 @Catch()

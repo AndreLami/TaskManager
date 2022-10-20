@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
-import { TaskEntity } from '../../../shared/src/entities/task.entity';
-import { TaskStatus } from '../../../shared/src/entities/task.status';
+import { TaskEntity } from '../../../../shared/src/entities/task.entity';
+import { TaskStatus } from '../../../../shared/src/entities/task.status';
 
 
 export class TasksHelper {

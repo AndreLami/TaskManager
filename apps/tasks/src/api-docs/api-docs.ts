@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common/interfaces/nest-application.interface';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { TasksModule } from '../tasks/tasks.module';
+import { TasksModule } from '../modules/tasks/tasks.module';
 import { AppEnvironment } from '../../../shared/src/environemtns/app.environment';
 
 

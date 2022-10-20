@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { ValidationMessage } from '../../utils/validation/validation.message';
+import { ValidationMessage } from '../../../utils/validation/validation.message';
 
 export class CreateTaskDto {
     @ApiProperty({ example: 'Boil egg', description: 'Name of the task' })

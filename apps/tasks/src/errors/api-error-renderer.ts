@@ -12,7 +12,7 @@ export class ApiErrorRenderer {
             errorObject.extra = error.extra
         }
 
-        if (error.reasons.length > 0) {
+        if (error.reasons && error.reasons.length > 0) {
             errorObject.reasons = error.reasons.map( reason => {
                 return this.renderReason(reason)
             })

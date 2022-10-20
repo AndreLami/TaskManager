@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ApiDocs } from './apiDocs/ApiDocs';
+import { ApiDocs } from './api-docs/api-docs';
 import { ApiExceptionFilter } from './errors/api.exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { ValidationErrorFormatterInterceptor } from './errors/validation.error.formatter.interceptor';

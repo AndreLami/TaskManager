@@ -1,14 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, LoggerService, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
-import { EchoService } from '../../../shared/src/echo/EchoService';
 import { CreateTaskDto } from './dto/create.task.dto';
-import { TaskEntity } from '../../../shared/src/entities/task.entity';
+import { TaskEntity } from '../../../../shared/src/entities/task.entity';
+import { AppLogger } from '../../../../shared/src/modules/logging/app-logger';
 
 @ApiTags('Address')
 @Controller('api/tasks')
 export class TasksController {
-    constructor(private tasksService: TasksService) {}
+    constructor(
+        private tasksService: TasksService,
+        private logger: AppLogger,
+    ) {}
 
     @Get('ping')
     getPing() {
@@ -41,6 +44,7 @@ export class TasksController {
 
     @Get('test')
     testTask() {
-        return this.tasksService.test()
+        this.logger.warn("Hello", "123", "321")
+        return 'Ok'
     }
 }

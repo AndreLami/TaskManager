@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { TaskEntity } from '../../../shared/src/entities/task.entity';
+import { TaskEntity } from '../../../../shared/src/entities/task.entity';
 import {
     CouldNotCompleteTaskTaskIsNotInProgressState,
     IncorrectTaskDependencies, TaskDoesNotExist,
     TooManyTaskDependencies,
-} from '../errors/task.errors';
+} from '../../errors/task.errors';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TaskDependencyEntity } from '../../../shared/src/entities/task.dependency.entity';
-import { TaskStatus, TaskVisibility } from '../../../shared/src/entities/task.status';
+import { TaskDependencyEntity } from '../../../../shared/src/entities/task.dependency.entity';
+import { TaskStatus, TaskVisibility } from '../../../../shared/src/entities/task.status';
 import { TasksHelper } from './tasks.helper';
 import { CreateTaskDto } from './dto/create.task.dto';
 
