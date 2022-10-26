@@ -1,9 +1,10 @@
 import { Body, Controller, Get, LoggerService, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto } from './dto/create.task.dto';
+import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskEntity } from '../../../../shared/src/entities/task.entity';
 import { AppLogger } from '../../../../shared/src/modules/logging/app-logger';
+import { GetTasksDto } from './dto/get-tasks.dto';
 
 @ApiTags('Address')
 @Controller('api/tasks')
@@ -30,6 +31,30 @@ export class TasksController {
         return task
     }
 
+    @ApiOperation({ summary: 'Returns task data' })
+    @ApiResponse({
+        status: 200,
+        type: TaskEntity,
+        description: 'Returns task data',
+    })
+    @Get(':id')
+    async getTask(@Param('id') taskId: number) {
+        let task = await this.tasksService.getTask(taskId)
+        return task
+    }
+
+    @ApiOperation({ summary: 'Fetch tasks matching criteria' })
+    @ApiResponse({
+        status: 200,
+        type: [TaskEntity],
+        description: 'Fetch tasks matching criteria',
+    })
+    @Get('')
+    async getTasks(@Body() taskData: GetTasksDto) {
+        let tasks = await this.tasksService.getTasks(taskData)
+        return tasks
+    }
+
     @ApiOperation({ summary: 'Complete task' })
     @ApiResponse({
         status: 200,
@@ -47,4 +72,5 @@ export class TasksController {
         this.logger.warn("Hello", "123", "321")
         return 'Ok'
     }
+
 }

@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { TaskEntity } from '../../../../shared/src/entities/task.entity';
 import { TaskStatus } from '../../../../shared/src/entities/task.status';
 
@@ -7,7 +7,7 @@ export class TasksHelper {
 
     static async collectReadyForInProgressTasks(
         taskIds: number[], repository: Repository<TaskEntity>
-    ): Promise<number[]> {
+    ): Promise<TaskEntity[]> {
         if (taskIds.length <= 0) {
             return []
         }
@@ -23,7 +23,7 @@ export class TasksHelper {
         )
 
         let readyTaskIds = result.map(readyTask => readyTask.taskId )
-        return readyTaskIds
+        return repository.find({ where: { id: In(readyTaskIds)} })
     }
 
 }

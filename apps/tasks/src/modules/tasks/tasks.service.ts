@@ -10,7 +10,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TaskDependencyEntity } from '../../../../shared/src/entities/task.dependency.entity';
 import { TaskStatus, TaskVisibility } from '../../../../shared/src/entities/task.status';
 import { TasksHelper } from './tasks.helper';
-import { CreateTaskDto } from './dto/create.task.dto';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { GetTasksDto } from './dto/get-tasks.dto';
+import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
+import { AppLogger } from '../../../../shared/src/modules/logging/app-logger';
+import { AppEventBuss } from '../events/app-event-buss';
+import { TasksReadyForProcessing } from '../events/events/tasks-ready-for-processing';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TasksService {
@@ -20,6 +26,8 @@ export class TasksService {
     constructor(
         @InjectRepository(TaskEntity) private readonly taskRepository: Repository<TaskEntity>,
         @InjectRepository(TaskDependencyEntity) private readonly taskDependencyRepository: Repository<TaskDependencyEntity>,
+        private appEventBus: AppEventBuss,
+        private logger: AppLogger,
     ) {}
 
     async test() {
@@ -38,16 +46,32 @@ export class TasksService {
         }
 
         if (task.status != TaskStatus.InProgress) {
-            console.log(1)
             throw new CouldNotCompleteTaskTaskIsNotInProgressState()
         }
-
-        console.log(2)
 
         task.status = TaskStatus.Completed
         task = await this.taskRepository.save(task)
         await this.adjustDependentTasksInProgressStatus(taskId)
         return task
+    }
+
+    async getTask(taskId: number): Promise<TaskEntity> {
+        const task = await this.taskRepository.findOne({ where: { id: taskId }})
+        if (task === null) {
+            throw new TaskDoesNotExist()
+        }
+
+        return task
+    }
+
+    async getTasks(tasksRequest: GetTasksDto): Promise<TaskEntity[]> {
+        let query: any = { where: {} };
+        if (tasksRequest.taskStatuses?.length > 0) {
+            query.where.status = In(tasksRequest.taskStatuses)
+        }
+
+        const tasks = await this.taskRepository.find(query)
+        return tasks
     }
 
     async create(taskData: CreateTaskDto): Promise<TaskEntity> {
@@ -87,12 +111,12 @@ export class TasksService {
         }
 
         if (dependenciesCount > 0) {
-            await this.adjustTasksInProgressStatus([task])
+            const adjustedTask = await this.adjustTasksInProgressStatus([task])
+            task = adjustedTask[0]
         }
 
-        task = await this.taskRepository.save({
-            id: task.id, visibility: TaskVisibility.Visible
-        })
+        task.visibility = TaskVisibility.Visible
+        task = await this.taskRepository.save(task)
 
         this.notifyTasksAreReadyForProcessingIfNeeded([task])
         return task
@@ -116,14 +140,18 @@ export class TasksService {
             .filter((task) => task.status == TaskStatus.Pending)
             .map( task => task.id)
 
-        const readyForInProgressTaskIds = await TasksHelper.collectReadyForInProgressTasks(taskIds, this.taskRepository)
+        let readyForInProgressTasks = await TasksHelper.collectReadyForInProgressTasks(taskIds, this.taskRepository)
+        readyForInProgressTasks.forEach(task => { task.status = TaskStatus.InProgress })
+        readyForInProgressTasks = await this.taskRepository.save(readyForInProgressTasks)
 
-        const statusChangedTasks: TaskEntity[] = readyForInProgressTaskIds.map( taskId => {
-            return <TaskEntity>{id: taskId, status: TaskStatus.InProgress}
-        })
-
-        const resultTasks = await this.taskRepository.save(statusChangedTasks)
-        this.notifyTasksAreReadyForProcessingIfNeeded(resultTasks)
+        this.notifyTasksAreReadyForProcessingIfNeeded(readyForInProgressTasks)
+        let seenIds = new Set<number>(readyForInProgressTasks.map( task => task.id))
+        let resultTasks: TaskEntity[] = readyForInProgressTasks
+        for (let task of tasks) {
+            if (!seenIds.has(task.id)) {
+                resultTasks.push(task)
+            }
+        }
 
         return resultTasks
     }
@@ -134,7 +162,7 @@ export class TasksService {
         }).map( task => task.id )
 
         if (readyTasksIds.length > 0) {
-            // this.notificationService.notify(new ReadyForProcessingTasks(readyTasksIds))
+            this.appEventBus.fire(new TasksReadyForProcessing(readyTasksIds))
         }
     }
 

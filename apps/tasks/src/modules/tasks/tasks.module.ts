@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskEntity } from '../../../../shared/src/entities/task.entity';
 import { TaskDependencyEntity } from '../../../../shared/src/entities/task.dependency.entity';
 import { LoggerModule } from '../../../../shared/src/modules/logging/logger.module';
+import { EventsModule } from '../events/events.module';
 
 @Module({
     imports: [
         EchoModule,
         TypeOrmModule.forFeature([TaskEntity, TaskDependencyEntity]),
-        LoggerModule
+        LoggerModule,
+        EventsModule
     ],
     controllers: [TasksController],
     providers: [TasksService],
