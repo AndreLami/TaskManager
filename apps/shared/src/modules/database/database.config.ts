@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { AppEnvironment } from '../../environemtns/app.environment';
+import { AppEnvironment } from '../../env/app.environment';
 
 export class DatabaseConfiguration {
     constructor(private readonly configService: ConfigService) {}

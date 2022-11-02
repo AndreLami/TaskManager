@@ -7,7 +7,7 @@ import { ValidationErrorFormatterInterceptor } from './errors/validation.error.f
 
 async function start() {
   const app = await NestFactory.create(AppModule);
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.TASKS_PORT || 3000;
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(

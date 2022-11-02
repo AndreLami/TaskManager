@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common/interfaces/nest-application.interface';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TasksModule } from '../modules/tasks/tasks.module';
-import { AppEnvironment } from '../../../shared/src/environemtns/app.environment';
+import { AppEnvironment } from '../../../shared/src/env/app.environment';
 
 
 export class ApiDocs {

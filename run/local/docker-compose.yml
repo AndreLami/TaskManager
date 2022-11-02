@@ -1,0 +1,60 @@
+version: '3.0'
+services:
+  tasks_api:
+    container_name: 'tasks_api'
+    build:
+      context: ../../
+      dockerfile: ./apps/tasks/build/docker/dev/Dockerfile
+    volumes:
+      - ./../../apps/tasks:/app/apps/tasks
+      - ./../../apps/shared:/app/apps/shared
+    ports:
+      - '3000:3000'
+    depends_on:
+      - tasks_database
+    env_file:
+      - .dev.config.env
+    restart: 'always'
+
+  notifier:
+    container_name: 'notifier'
+    build:
+      context: ../../
+      dockerfile: ./apps/notifier/build/docker/dev/Dockerfile
+    volumes:
+      - ./../../apps/notifier:/app/apps/notifier
+      - ./../../apps/shared:/app/apps/shared
+    ports:
+      - '3001:3001'
+    depends_on:
+      - tasks_database
+    env_file:
+      - .dev.config.env
+    restart: 'always'
+
+  tasks_database:
+    container_name: 'tasks_database'
+    image: 'mariadb:10.5.8'
+    ports:
+      - "3308:3306"
+    volumes:
+      - tasks_db_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'tasks'
+      MYSQL_USER: 'admin'
+      MYSQL_PASSWORD: 'root'
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_ROOT_HOST: '%'
+      TZ: Asia/Jerusalem
+    restart: 'always'
+
+  redis_pub_sub:
+      image: redis:7.0.5-alpine
+      restart: always
+      ports:
+        - '6379:6379'
+      command: redis-server --save 20 1 --loglevel warning
+
+
+volumes:
+  tasks_db_data:

@@ -3,7 +3,7 @@ import { Client } from '@elastic/elasticsearch';
 import { ElasticsearchTransport } from 'winston-elasticsearch';
 import { createLogger, transports, Logger, format} from "winston";
 import * as Transport from 'winston-transport';
-import { AppEnvironment } from '../../environemtns/app.environment';
+import { AppEnvironment } from '../../env/app.environment';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

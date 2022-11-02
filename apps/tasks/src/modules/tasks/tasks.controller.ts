@@ -5,6 +5,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskEntity } from '../../../../shared/src/entities/task.entity';
 import { AppLogger } from '../../../../shared/src/modules/logging/app-logger';
 import { GetTasksDto } from './dto/get-tasks.dto';
+import { PubSubService } from '../../../../shared/src/modules/pubsub/pub-sub.service';
 
 @ApiTags('Address')
 @Controller('api/tasks')
@@ -12,7 +13,27 @@ export class TasksController {
     constructor(
         private tasksService: TasksService,
         private logger: AppLogger,
+        private pubSubService: PubSubService,
     ) {}
+
+    private counter = 0
+
+    @Get('channel1')
+    async channel1Hello(): Promise<string> {
+        this.pubSubService.publish('channel1', `Hello: ${this.counter}`);
+        this.counter += 1
+
+        return "Hello from channel1"
+    }
+
+
+    @Get('channel2')
+    async channel2Hello(): Promise<string> {
+        this.pubSubService.publish('channel2', `Hello: ${this.counter}`);
+        this.counter += 1
+
+        return "Hello from channel2"
+    }
 
     @Get('ping')
     getPing() {

@@ -18,23 +18,6 @@
         "tsConfigPath": "apps/tasks/tsconfig.app.json"
       }
     },
-    "notification": {
-      "type": "application",
-      "root": "apps/notification",
-      "entryFile": "main",
-      "sourceRoot": "apps/notification/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/notification/tsconfig.app.json"
-      }
-    },
-    "modules": {
-      "type": "application",
-      "root": "apps/modules",
-      "sourceRoot": "apps/modules/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/modules/tsconfig.app.json"
-      }
-    },
     "shared": {
       "type": "application",
       "root": "apps/shared",
@@ -42,6 +25,15 @@
       "sourceRoot": "apps/shared/src",
       "compilerOptions": {
         "tsConfigPath": "apps/shared/tsconfig.app.json"
+      }
+    },
+    "notifier": {
+      "type": "application",
+      "root": "apps/notifier",
+      "entryFile": "main",
+      "sourceRoot": "apps/notifier/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notifier/tsconfig.app.json"
       }
     }
   }

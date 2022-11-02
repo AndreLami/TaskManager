@@ -12,11 +12,9 @@ import { TaskStatus, TaskVisibility } from '../../../../shared/src/entities/task
 import { TasksHelper } from './tasks.helper';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksDto } from './dto/get-tasks.dto';
-import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { AppLogger } from '../../../../shared/src/modules/logging/app-logger';
 import { AppEventBuss } from '../events/app-event-buss';
 import { TasksReadyForProcessing } from '../events/events/tasks-ready-for-processing';
-import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TasksService {
