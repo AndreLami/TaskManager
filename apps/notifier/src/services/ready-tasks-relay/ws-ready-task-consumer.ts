@@ -5,12 +5,10 @@ import { TaskEntity } from '../../../../shared/src/entities/task.entity';
 
 export class WsReadyTaskConsumer implements ReadyTaskConsumer {
 
-    constructor(private socket: WebSocket) {}
+    constructor(private socket: WebSocket, readonly identifier: string) {}
 
-    notifyTaskIsReady(task: TaskEntity) {
-        this.socket.send({'id': task.id} )
+    notifyTaskIsReady(tasks: TaskEntity[]) {
+        this.socket.send(JSON.stringify(tasks))
     }
-
-
 
 }

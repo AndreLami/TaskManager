@@ -96,16 +96,17 @@ export class TasksService {
 
         task = await this.taskRepository.save(task);
         if (dependenciesCount > 0) {
-            task.parents = []
+            const parents = []
             for (let dependencyId of taskData.dependencies) {
                 const dependency = this.taskDependencyRepository.create({
                     child: task,
                     parent: <TaskEntity>{id: dependencyId}
                 })
-                task.parents.push(dependency)
+
+                parents.push(dependency)
             }
 
-            await this.taskDependencyRepository.save(task.parents)
+            await this.taskDependencyRepository.save(parents)
         }
 
         if (dependenciesCount > 0) {

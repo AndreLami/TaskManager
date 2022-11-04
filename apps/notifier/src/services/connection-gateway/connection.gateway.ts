@@ -8,30 +8,28 @@ import {
 import WebSocket, { WebSocketServer as WSServer} from 'ws';
 import { IncomingMessage } from 'http';
 import { ReadyTasksRelayService } from '../ready-tasks-relay/ready-tasks-relay.service';
+import { WsReadyTaskConsumer } from '../ready-tasks-relay/ws-ready-task-consumer';
 
 type WsWithId = WebSocket & {identifier: string}
 
-@WebSocketGateway(3002,  { transports: ['websocket'] })
-export class ConnectionGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+@WebSocketGateway()
+export class ConnectionGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @WebSocketServer() server: WSServer;
 
     constructor(
-        private readTaskRelayService: ReadyTasksRelayService
+        private readyTaskRelayService: ReadyTasksRelayService
     ) {}
-
-    afterInit(server: WebSocket) {
-        console.log('Initialized .....');
-    }
 
     handleConnection(client: WsWithId, message: IncomingMessage) {
         client.identifier = this.generateId()
-        this.readTaskRelayService
-        console.log('Client connected:', message);
+        this.readyTaskRelayService.registerConsumer(
+            new WsReadyTaskConsumer(client, client.identifier)
+        )
     }
 
     handleDisconnect(client: WsWithId) {
-        console.log('Client disconnected:', client);
+        this.readyTaskRelayService.deregisterConsumer(client.identifier)
     }
 
     private counter: number = 0
